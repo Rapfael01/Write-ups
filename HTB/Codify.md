@@ -2,9 +2,9 @@
 
 This machine can be viewed at: https://app.hackthebox.com/machines/Codify
 
-##Phase 1: External enumeration
+##Phase 1: Initial Foothold
 
-We begin the machine by executing the following nmap scans
+We begin the machine by enumerating the ports and services open using the following nmap scans
 
 ```markdown
 sudo nmap -sS -p- -Pn -n --min-rate 5000 $IP
@@ -47,3 +47,10 @@ Nmap done: 1 IP address (1 host up) scanned in 14.68 seconds
 ```
 
 We learn that the unknown service is a Node.js frame. We enter the web server to begin enumeration.
+
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/7f790118-aed2-4c60-bf03-ded91655ff39)
+
+We begin some GoBuster scans in the background in case there are some hidden web directories, however, we can find three pages from the get go: /index, /about and /editor. We are mainly interested in /about and /editor.
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/90a4e893-1fe7-4fa8-a8d5-9793c9d0578e)
+
+/editor
