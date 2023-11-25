@@ -53,4 +53,10 @@ We learn that the unknown service is a Node.js frame. We enter the web server to
 We begin some GoBuster scans in the background in case there are some hidden web directories, however, we can find three pages from the get go: /index, /about and /editor. We are mainly interested in /about and /editor.
 ![image](https://github.com/Rapfael01/Write-ups/assets/70867743/90a4e893-1fe7-4fa8-a8d5-9793c9d0578e)
 
-/editor
+- **/editor**: A simple page that allows the users compile and execute Node.js code on the web.
+
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/fb5f7ad8-74d0-4b4b-8db8-0efb0879fb40)
+
+- **/about**: A simple about page, where we learn the page uses vm2 and is linked to the release version (3.9.16).
+
+After we research about this vm2 version, we learn that there is an arbitrary code execution vulnerability
