@@ -220,3 +220,7 @@ root@codify:/tmp/.pwned#
 ```
 
 And just like that, this machine has been pwned!
+
+##Lessons
+
+After researching a little bit, I learned that the bash vulnerability was caused because of the use of [pattern matching](https://www.baeldung.com/linux/bash-single-vs-double-brackets#4-pattern-matching) instead of exact string matching. This issue can be easily resolved by changing [[]] for [] in the password confirmation section for the script.
