@@ -62,4 +62,52 @@ ________________________________________________
 dev                     [Status: 200, Size: 23221, Words: 5081, Lines: 502, Duration: 129ms]
 :: Progress: [19966/19966] :: Job [1/1] :: 439 req/sec :: Duration: [0:00:42] :: Errors: 0 ::
 ```
-Just that! They own a dev subd9
+Just that! They own a development subdomain.
+
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/d938251c-708c-4740-b539-6625d825e9b2)
+
+We run a GoBuster scan and we get wildly different results.
+
+```
+gobuster dir -u http://dev.devvortex.htb -w /usr/share/SecLists-master/Discovery/Web-Content/raft-medium-directories.txt -x html,txt,js,css,php
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://dev.devvortex.htb
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/SecLists-master/Discovery/Web-Content/raft-medium-directories.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              html,txt,js,css,php
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/images               (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/images/]
+/includes             (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/includes/]
+/modules              (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/modules/]
+/templates            (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/templates/]
+/cache                (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/cache/]
+/media                (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/media/]
+/language             (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/language/]
+/tmp                  (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/tmp/]
+/plugins              (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/plugins/]
+/administrator        (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/administrator/]
+/components           (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/components/]
+/libraries            (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/libraries/]
+/api                  (Status: 301) [Size: 178] [--> http://dev.devvortex.htb/api/]
+/home                 (Status: 200) [Size: 23221]
+/index.php            (Status: 200) [Size: 23221]
+```
+Before we explore any of the subdomains, it's always good practice to check for robots.txt and sitemap.xml.
+
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/12b62ead-01e7-4601-ba1d-a575c06c07df)
+
+Disallow /joomla/administrator? We find out we're facing a joomla webpage. Utilizing some enumeration tips provided by [HackTricks](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiZ4JrugpSDAxWfPkQIHdIFBmgQFnoECAgQAQ&url=https%3A%2F%2Fbook.hacktricks.xyz%2Fnetwork-services-pentesting%2Fpentesting-web%2Fjoomla&usg=AOvVaw0ii4l5hm2LSpb0gOClURRL&opi=89978449), we find out the Joomla version we're facing is version 4.2.6 by entering /administrator/manifests/files/joomla.xml.
+
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/c10e994f-7f2f-4987-bdf6-36f226fee941)
+
+This version is vulnerable to an information disclosure vulnerability identified as CVE-2023-23752. While researching this vulnerability, I found this great [article](https://vulncheck.com/blog/joomla-for-rce) written by (Jacob Baines)[https://www.linkedin.com/in/jacob-baines-1490a7189/] that goes over the vulnerability. Basically, this vulnerability allows you to make certain API calls that allow you to either disclose database users+passwords or Joomla users only. Both are extremely valuable and can be used to run credential stuffing attacks as a last resort. We will be making these api calls through the web page so we can have better visibility of the data provided.
+
