@@ -1,1 +1,65 @@
+#HTB-Devvortex
 
+This machine can be viewed at: https://app.hackthebox.com/machines/577
+
+##Phase 1: Initial Foothold
+
+As usual, we begin by scanning for open ports using an nmap syn scan. We quickly find that the machine only has SSH and HTTP up. Following this, we use a version scan to find extra information about the services that are shown available.
+
+```
+sudo nmap -sCV -p 22,80 -oN targeted $IP
+[sudo] password for rat: 
+Starting Nmap 7.94 ( https://nmap.org ) at 2023-12-16 12:44 UTC
+Nmap scan report for devvortex.htb (10.10.11.242)
+Host is up (0.072s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.9 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 48:ad:d5:b8:3a:9f:bc:be:f7:e8:20:1e:f6:bf:de:ae (RSA)
+|   256 b7:89:6c:0b:20:ed:49:b2:c1:86:7c:29:92:74:1c:1f (ECDSA)
+|_  256 18:cd:9d:08:a6:21:a8:b8:b6:f7:9f:8d:40:51:54:fb (ED25519)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: DevVortex
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 9.59 seconds
+```
+
+We head towards the webpage to see if there's any way we can access the machine.
+
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/43a921eb-00a0-41ce-b37a-600430f1b6a8)
+
+I ran a couple GoBuster scans with different word lists to try to find any hidden pages, since the ones that were available did not have any apparent vulnerabilities that I could exploit. So maybe that wasn't the right path. Maybe another subdomain? For this end, we use [ffuf](https://github.com/ffuf/ffuf) to enumerate existing subdomains.
+
+```
+ffuf -w /usr/share/SecLists-master/Discovery/DNS/subdomains-top1million-20000.txt -u http://devvortex.htb -H "Host: FUZZ.devvortex.htb" -fw 4
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://devvortex.htb
+ :: Wordlist         : FUZZ: /usr/share/SecLists-master/Discovery/DNS/subdomains-top1million-20000.txt
+ :: Header           : Host: FUZZ.devvortex.htb
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200-299,301,302,307,401,403,405,500
+ :: Filter           : Response words: 4
+________________________________________________
+
+dev                     [Status: 200, Size: 23221, Words: 5081, Lines: 502, Duration: 129ms]
+:: Progress: [19966/19966] :: Job [1/1] :: 439 req/sec :: Duration: [0:00:42] :: Errors: 0 ::
+```
+Just that! They own a dev subd9
