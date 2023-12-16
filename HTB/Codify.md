@@ -1,8 +1,8 @@
-#HTB-Codify
+# HTB-Codify
 
 This machine can be viewed at: https://app.hackthebox.com/machines/Codify
 
-##Phase 1: Initial Foothold
+## Phase 1: Initial Foothold
 
 We begin the machine by enumerating the ports and services open using the following nmap scans
 
@@ -65,7 +65,7 @@ After we research about this vm2 version, we learn that there is an arbitrary co
 We set up a nc listener, execute a reverse shell command and stabilize the shell, and we have the initial foothold!
 ![image](https://github.com/Rapfael01/Write-ups/assets/70867743/4865dce3-41aa-4afd-8607-293260e57288)
 
-##Phase 2: PrivEsc to user
+## Phase 2: PrivEsc to user
 
 As we stand right now, we're in a low privilege account from which we cannot do too much. We can check for accounts that have access to bash by quickly enumerating them from the /etc/passwd file.
 
@@ -129,7 +129,7 @@ joshua@codify:/var/www/contact$
 ```
 And just like that, we are now a user and get our user flag! We can also connect via SSH for a more stable shell.
 
-##Phase 3: PrivEsc to root
+## Phase 3: PrivEsc to root
 
 My first instict was to use the existing MySQL table users (which we learned was there in the tickets.db file) to try to find the hash for the root user and decrypt it. Although the password hash was there, we could not find a hit using rockyou.txt, so we move on to find another escalation vector.
 
@@ -221,6 +221,6 @@ root@codify:/tmp/.pwned#
 
 And just like that, this machine has been pwned!
 
-##Lessons
+## Lessons
 
 After researching a little bit, I learned that the bash vulnerability was caused because of the use of [pattern matching](https://www.baeldung.com/linux/bash-single-vs-double-brackets#4-pattern-matching) instead of exact string matching. This issue can be easily resolved by changing [[]] for [] in the password confirmation section for the script.
