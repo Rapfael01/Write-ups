@@ -1,4 +1,4 @@
-#HTB-Devvortex
+# HTB-Devvortex
 
 This machine can be viewed at: https://app.hackthebox.com/machines/577
 
@@ -141,7 +141,7 @@ Now, we set up our nc listener and run the code and stabilize the shell, and boo
 
 ![image](https://github.com/Rapfael01/Write-ups/assets/70867743/079a61bc-741d-44ec-90f0-701adbc34e98)
 
-##Phase 2: User PrivEsc
+## Phase 2: User PrivEsc
 
 Now that we have access to the machine, we enumerate existing users with a terminal available.
 
@@ -218,7 +218,7 @@ logan@devvortex:~$
 ```
 And we have user access!
 
-##Phase 3: PrivEsc to root.
+## Phase 3: PrivEsc to root.
 
 Since we have the password, we can check if logan can execute anything as root.
 
@@ -317,3 +317,7 @@ We have to choose View Report in order to get the less instance. Now, we type !/
 ![image](https://github.com/Rapfael01/Write-ups/assets/70867743/95b8e687-036d-45a8-9d1e-be2e3f365fdd)
 
 We are now root!
+
+## Lessons
+
+Overall this machine was pretty simple to solve. Other than learning about new CVEs, it mostly served to practice my already learned abilities.
