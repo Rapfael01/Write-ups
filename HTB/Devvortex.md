@@ -109,7 +109,7 @@ Disallow /joomla/administrator? We find out we're facing a joomla webpage. Utili
 
 ![image](https://github.com/Rapfael01/Write-ups/assets/70867743/c10e994f-7f2f-4987-bdf6-36f226fee941)
 
-This version is vulnerable to an information disclosure vulnerability identified as CVE-2023-23752. While researching this vulnerability, I found this great [article](https://vulncheck.com/blog/joomla-for-rce) written by (Jacob Baines)[https://www.linkedin.com/in/jacob-baines-1490a7189/] that goes over the vulnerability. Basically, this vulnerability allows you to make certain API calls that allow you to either disclose database users+passwords or Joomla users only. Both are extremely valuable and can be used to run credential stuffing attacks as a last resort. We will be making these api calls through the web page so we can have better visibility of the data provided.
+This version is vulnerable to an information disclosure vulnerability identified as CVE-2023-23752. While researching this vulnerability, I found this great [article](https://vulncheck.com/blog/joomla-for-rce) written by [Jacob Baines](https://www.linkedin.com/in/jacob-baines-1490a7189) that goes over the vulnerability. Basically, this vulnerability allows you to make certain API calls that allow you to either disclose database users+passwords or Joomla users only. Both are extremely valuable and can be used to run credential stuffing attacks as a last resort. We will be making these api calls through the web page so we can have better visibility of the data provided.
 
 We find out there are two Joomla users registered, Logan and Lewis.
 
