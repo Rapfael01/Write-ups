@@ -2,7 +2,7 @@
 
 This machine can be viewed at: https://app.hackthebox.com/machines/577
 
-##Phase 1: Initial Foothold
+## Phase 1: Initial Foothold
 
 As usual, we begin by scanning for open ports using an nmap syn scan. We quickly find that the machine only has SSH and HTTP up. Following this, we use a version scan to find extra information about the services that are shown available.
 
