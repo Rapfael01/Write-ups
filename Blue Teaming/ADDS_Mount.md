@@ -27,3 +27,9 @@ We set the password for the DC Options, we won't be making any DNS Changes for t
 
 ![image](https://github.com/Rapfael01/Write-ups/assets/70867743/b6eb15ac-4ec0-4271-825f-bed4ec1c9c9e)
 After this, we can click on install and begin the promotion.
+
+## Part 2: Creatings OU's for each department
+
+Next up, we will create Organizational Units for each of the departements in the company. We will use IT, HR, Sales, Management and Finance for this example. In order to create an OU, we go into **Active Directory Users and Computers**, select our Domain, click on Action->New->Organizational Unit and click.
+![image](https://github.com/Rapfael01/Write-ups/assets/70867743/85a04ab0-5348-455c-92ed-19725fca50c6)
+
